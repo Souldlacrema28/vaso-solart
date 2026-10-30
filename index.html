@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaso Solart Allstars</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: visor 3D a todo el ancho con el texto a la izquierda; después el diseño desplegado, la película de la estrella, renders y concept art. */
+:root{
+  --bg:#060607;
+  --panel:#0e0e11;
+  --line:#26262c;
+  --ink:#f3f0ea;
+  --mute:#8c8c95;
+  --star:#ffb800;
+  --display:"Unbounded","Arial Black",Impact,sans-serif;
+  --body:"Figtree","Helvetica Neue",Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--star);outline-offset:3px}
+.wrap{width:min(1180px,100% - 32px);margin-inline:auto}
+
+/* barra superior */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0}
+.top img{height:34px;width:auto}
+.top p{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);text-align:right}
+.top b{color:var(--ink);font-weight:600}
+
+/* visor */
+.hero{position:relative;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:
+  radial-gradient(ellipse 38% 70% at 50% 0%,rgba(255,255,255,.13),transparent 70%),
+  radial-gradient(ellipse 60% 40% at 50% 100%,rgba(255,255,255,.07),transparent 70%),
+  #040405;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.7;background-image:
+  radial-gradient(1px 1px at 12% 22%,#fff9,transparent),radial-gradient(1px 1px at 78% 14%,#fff8,transparent),
+  radial-gradient(1.5px 1.5px at 33% 68%,#fff7,transparent),radial-gradient(1px 1px at 91% 58%,#fff9,transparent),
+  radial-gradient(1px 1px at 55% 33%,#fff6,transparent),radial-gradient(1px 1px at 6% 80%,#fff7,transparent),
+  radial-gradient(1.5px 1.5px at 68% 86%,#fff6,transparent),radial-gradient(1px 1px at 44% 9%,#fff8,transparent),
+  radial-gradient(1px 1px at 87% 91%,#fff6,transparent),radial-gradient(1px 1px at 22% 46%,#fff5,transparent)}
+.hero-grid{position:relative;display:grid;grid-template-columns:minmax(240px,320px) 1fr minmax(0,150px);gap:24px;min-height:760px}
+.mid{min-height:760px}
+.copy{align-self:center;padding:40px 0;position:relative;z-index:2}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--star);font-weight:600}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(40px,5.4vw,68px);line-height:.98;letter-spacing:-.02em;margin:14px 0 20px;text-wrap:balance}
+h1 span{display:block;color:var(--star)}
+.copy p.lead{color:#cfccc5;max-width:34ch}
+.swatches{display:flex;gap:10px;margin-top:26px;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute)}
+.sw i{width:14px;height:14px;border-radius:50%;border:1px solid #ffffff30}
+#stage{position:relative;min-height:620px;cursor:grab;touch-action:pan-y;outline-offset:-4px;user-select:none;-webkit-user-select:none}
+#stage.drag{cursor:grabbing}
+#stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.hint{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mute);white-space:nowrap;pointer-events:none;transition:opacity .6s}
+.hint.off{opacity:0}
+.loading{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);font-size:13px;letter-spacing:.12em;text-transform:uppercase;pointer-events:none}
+.loading.off{display:none}
+.fallback{position:absolute;inset:0;display:none;place-items:center}
+.fallback.on{display:grid}
+.fallback img{max-height:100%;object-fit:contain}
+.views{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);display:flex;gap:6px;padding:5px;border:1px solid var(--line);border-radius:999px;background:#0b0b0de0;backdrop-filter:blur(8px);z-index:2}
+.views button{white-space:nowrap;padding:9px 16px;border-radius:999px;font-size:13px;font-weight:500;color:var(--mute);transition:background .2s,color .2s}
+.views button:hover{color:var(--ink)}
+.views button[aria-pressed="true"]{background:var(--star);color:#120d00;font-weight:600}
+.views .sep{width:1px;background:var(--line);margin:6px 2px}
+.views .auto[aria-pressed="true"]{background:#ffffff1a;color:var(--ink)}
+.side{align-self:center;display:flex;flex-direction:column;gap:18px;font-size:12px;color:var(--mute);padding:40px 0;position:relative;z-index:2}
+.side b{display:block;font-family:var(--display);font-weight:500;font-size:20px;color:var(--ink);letter-spacing:-.01em}
+.side div{border-top:1px solid var(--line);padding-top:10px}
+
+@media (min-width:981px){
+  .hero-grid{position:static}
+  #stage{position:absolute;inset:0;min-height:0;z-index:1}
+  .copy,.side{pointer-events:none}
+}
+/* secciones */
+section.block{padding:88px 0 0}
+.head{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+h2{font-family:var(--display);font-weight:800;font-size:clamp(26px,3.4vw,40px);line-height:1.05;letter-spacing:-.02em;text-wrap:balance}
+.head p{color:var(--mute);max-width:46ch}
+
+/* diseño desplegado */
+.flat{position:relative;border:1px solid var(--line);background:#000;overflow:hidden;cursor:pointer;aspect-ratio:4096/2640;max-width:960px;margin-inline:auto;border-radius:4px}
+.flat img{position:absolute;inset:0;width:100%;height:100%}
+.win{position:absolute;top:0;bottom:0;width:34%;border-inline:2px solid var(--star);background:linear-gradient(90deg,#ffb80026,#ffb80010 50%,#ffb80026);pointer-events:none;clip-path:inset(0 -2px)}
+.flat .seam{position:absolute;top:0;bottom:0;width:0;border-left:1px dashed #ffffff55;pointer-events:none}
+.flat .seam.r{right:0;border-left:0;border-right:1px dashed #ffffff55}
+.flat .tag{position:absolute;bottom:10px;transform:translateX(-50%);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#fff;background:#000a;padding:3px 8px;border-radius:99px;pointer-events:none;white-space:nowrap}
+.flat-wrap{position:relative}
+.note{max-width:960px;margin:14px auto 0;font-size:13px;color:var(--mute)}
+
+/* película */
+.film{margin-top:88px;position:relative;border-block:1px solid var(--line);background:#000}
+.film video{width:100%;display:block;aspect-ratio:4452/1860;object-fit:cover;max-height:620px}
+.film .over{position:absolute;left:0;right:0;bottom:0;padding:0 0 28px;pointer-events:none;background:linear-gradient(transparent,#000b)}
+.film .over .wrap{display:flex;justify-content:space-between;align-items:end;gap:16px}
+.film .date{font-family:var(--display);font-weight:800;font-size:clamp(28px,5vw,64px);color:var(--star);line-height:1;letter-spacing:-.02em}
+.film small{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#d8d5ce;text-align:right}
+
+/* renders */
+.renders{display:grid;grid-template-columns:1fr 168px;gap:14px}
+.main-r{position:relative;border:1px solid var(--line);background:#000;aspect-ratio:16/9;overflow:hidden;border-radius:4px}
+.main-r img{width:100%;height:100%;object-fit:cover}
+.main-r figcaption{position:absolute;left:0;right:0;bottom:0;padding:34px 20px 16px;background:linear-gradient(transparent,#000c);font-size:14px;color:#e5e2db}
+.thumbs{display:flex;flex-direction:column;gap:14px}
+.thumbs button{position:relative;border:1px solid var(--line);aspect-ratio:16/9;overflow:hidden;border-radius:4px;opacity:.55;transition:opacity .2s,border-color .2s}
+.thumbs button:hover{opacity:.9}
+.thumbs button[aria-pressed="true"]{opacity:1;border-color:var(--star)}
+.thumbs img{width:100%;height:100%;object-fit:cover}
+
+/* concept art */
+.strip{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:14px;scrollbar-color:#333 transparent}
+.strip figure{flex:0 0 min(640px,82%);scroll-snap-align:start}
+.strip img{border:1px solid var(--line);border-radius:4px;aspect-ratio:3440/1440;object-fit:cover;width:100%}
+.strip figcaption{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute);margin-top:8px}
+
+footer{margin-top:96px;border-top:1px solid var(--line);padding:28px 0 48px;font-size:13px;color:var(--mute);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer img{height:26px;width:auto;opacity:.9}
+
+@media (max-width:980px){
+  .mid{display:none}
+  .hero-grid{grid-template-columns:1fr;min-height:0;gap:0}
+  .side{display:none}
+  .copy{padding:32px 0 0}
+  #stage{min-height:560px}
+  .renders{grid-template-columns:1fr}
+  .thumbs{flex-direction:row}
+  .thumbs button{flex:1}
+}
+@media (max-width:560px){
+  .views{width:calc(100% - 24px);justify-content:center;flex-wrap:wrap;border-radius:18px;bottom:16px}
+  .views button{padding:8px 11px}
+  .hint{display:none}
+  #stage{min-height:600px}
+  .top p{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="wrap top">
+  <img src="img/logo.png" alt="Solart Festival">
+  <p><b>Allstars Edition</b> · 26.12.26 · Hangar 37</p>
+</header>
+
+<main>
+<section class="hero" aria-label="Visor 3D del vaso">
+  <div class="wrap hero-grid">
+    <div class="copy">
+      <p class="eyebrow">Solart Festival · 26.12.26</p>
+      <h1>El vaso <span>Allstars</span></h1>
+      <p class="lead">Gíralo con el ratón o con el dedo. El diseño da la vuelta entera: logo y fecha delante, la estrella rota en el costado y el arco de polvo estelar al otro lado.</p>
+      <div class="swatches" aria-label="Paleta">
+        <span class="sw"><i style="background:#ffb800"></i>Amarillo estrella</span>
+        <span class="sw"><i style="background:#f3f0ea"></i>Blanco polvo</span>
+        <span class="sw"><i style="background:#0a0a0c"></i>Negro cielo</span>
+      </div>
+    </div>
+
+    <div class="mid" aria-hidden="true"></div>
+    <div id="stage" tabindex="0" role="img" aria-label="Vaso del festival en 3D. Arrastra para girarlo; las flechas izquierda y derecha también lo giran.">
+      <div class="loading" id="loading">Cargando vaso</div>
+      <div class="fallback" id="fallback"><img src="img/render-frente.jpg" alt="Vaso Solart Allstars"></div>
+      <p class="hint" id="hint">Arrastra para girar · doble toque para acercar</p>
+      <div class="views" role="group" aria-label="Vistas del vaso">
+        <button type="button" data-u="0.36" aria-pressed="false">Frente</button>
+        <button type="button" data-u="0.72" aria-pressed="false">Estrella</button>
+        <button type="button" data-u="0.17" aria-pressed="false">Arco</button>
+        <button type="button" data-u="0.93" aria-pressed="false">Dorso</button>
+        <span class="sep" aria-hidden="true"></span>
+        <button type="button" class="auto" id="auto" aria-pressed="true">Giro automático</button>
+      </div>
+    </div>
+
+    <aside class="side" aria-label="Datos">
+      <div><b>26.12.26</b>Fecha</div>
+      <div><b>Hangar 37</b>San Bartolomé de Tirajana, Las Palmas</div>
+      <div><b>360°</b>Diseño envolvente</div>
+    </aside>
+  </div>
+</section>
+
+<section class="block wrap" aria-labelledby="t-flat">
+  <div class="head">
+    <h2 id="t-flat">El diseño, desplegado</h2>
+    <p>Una sola imagen que rodea el vaso. La ventana marca lo que se ve ahora de frente; toca cualquier zona para llevarla al centro.</p>
+  </div>
+  <div class="flat-wrap">
+    <div class="flat" id="flat" role="button" tabindex="0" aria-label="Diseño desplegado. Pulsa una zona para girar el vaso hasta ella.">
+      <img src="img/wrap.jpg" alt="Diseño completo desplegado del vaso" loading="lazy">
+      <div class="win" id="win1"></div>
+      <div class="win" id="win2"></div>
+      <span class="seam"></span><span class="seam r"></span>
+      <span class="tag" style="left:20%">Arco</span>
+      <span class="tag" style="left:36%">Frente</span>
+      <span class="tag" style="left:72%">Estrella</span>
+      <span class="tag" style="left:93%">Dorso</span>
+    </div>
+  </div>
+  <p class="note">Las líneas discontinuas de los extremos son la costura: ahí se juntan el borde izquierdo y el derecho.</p>
+</section>
+
+<section class="film" aria-label="La estrella">
+  <video id="film" src="vid/estrella.mp4" muted loop playsinline autoplay preload="metadata" aria-label="La estrella dorada girando en el escenario"></video>
+  <div class="over"><div class="wrap">
+    <span class="date">26.12.26</span>
+    <small>Allstars Edition</small>
+  </div></div>
+</section>
+
+<section class="block wrap" aria-labelledby="t-r">
+  <div class="head">
+    <h2 id="t-r">Así se vería</h2>
+    <p>Renders de presentación con el diseño aplicado: en estudio y en mano, de noche, delante del escenario.</p>
+  </div>
+  <div class="renders">
+    <figure class="main-r"><img id="rimg" src="img/render-frente.jpg" alt="Vaso de frente en estudio"><figcaption id="rcap">En estudio, de frente</figcaption></figure>
+    <div class="thumbs" role="group" aria-label="Elegir render">
+      <button type="button" aria-pressed="true" data-src="img/render-frente.jpg" data-cap="En estudio, de frente" data-alt="Vaso de frente en estudio"><img src="img/render-frente.jpg" alt="" loading="lazy"></button>
+      <button type="button" aria-pressed="false" data-src="img/render-mano.jpg" data-cap="En mano, de noche en el festival" data-alt="Mano levantando el vaso delante del escenario"><img src="img/render-mano.jpg" alt="" loading="lazy"></button>
+      <button type="button" aria-pressed="false" data-src="img/render-estrella.jpg" data-cap="En estudio, el lado de la estrella" data-alt="Vaso visto de lado con la estrella dorada"><img src="img/render-estrella.jpg" alt="" loading="lazy"></button>
+    </div>
+  </div>
+</section>
+
+<section class="block wrap" aria-labelledby="t-c">
+  <div class="head">
+    <h2 id="t-c">Concept art</h2>
+    <p>La línea visual de la edición Allstars, de la que sale el vaso.</p>
+  </div>
+  <div class="strip" tabindex="0" aria-label="Concept art del festival">
+    <figure><img src="img/c1.jpg" alt="Portada del concept art" loading="lazy"><figcaption>Portada</figcaption></figure>
+    <figure><img src="img/c3.jpg" alt="Público bajo los arcos de luz" loading="lazy"><figcaption>Escenario</figcaption></figure>
+    <figure><img src="img/c5.jpg" alt="Directo con láseres" loading="lazy"><figcaption>Directo</figcaption></figure>
+    <figure><img src="img/c7.jpg" alt="Cartel sobre fondo amarillo" loading="lazy"><figcaption>Cartel</figcaption></figure>
+    <figure><img src="img/c9.jpg" alt="Tres estrellas de luz" loading="lazy"><figcaption>Tres estrellas</figcaption></figure>
+    <figure><img src="img/c10.jpg" alt="Logo y firma all stars" loading="lazy"><figcaption>Marca</figcaption></figure>
+  </div>
+</section>
+</main>
+
+<footer class="wrap">
+  <img src="img/logo.png" alt="Solart Festival">
+  <span>Propuesta de diseño del vaso. Los renders son de presentación; el modelo 3D es una aproximación de la forma.</span>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var TAU=Math.PI*2;
+  var stage=document.getElementById('stage');
+  var loading=document.getElementById('loading');
+  var fallback=document.getElementById('fallback');
+  var hint=document.getElementById('hint');
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---- galería de renders ---- */
+  var thumbs=document.querySelectorAll('.thumbs button');
+  thumbs.forEach(function(b){
+    b.addEventListener('click',function(){
+      thumbs.forEach(function(x){x.setAttribute('aria-pressed','false')});
+      b.setAttribute('aria-pressed','true');
+      var i=document.getElementById('rimg');
+      i.src=b.dataset.src;i.alt=b.dataset.alt;
+      document.getElementById('rcap').textContent=b.dataset.cap;
+    });
+  });
+
+  /* ---- vídeo: pausa si no se ve o si el usuario reduce movimiento ---- */
+  var film=document.getElementById('film');
+  if(reduce){film.removeAttribute('autoplay');film.pause()}
+  else if('IntersectionObserver' in window){
+    new IntersectionObserver(function(es){es.forEach(function(e){
+      if(e.isIntersecting){var p=film.play();if(p&&p.catch)p.catch(function(){})}else film.pause();
+    })},{threshold:.15}).observe(film);
+  }
+
+  /* ---- estado de rotación ---- */
+  var rotY=-0.36*TAU, targetY=null, vel=0, dragging=false;
+  var auto=!reduce, lastTouch=-1e9, camDist=46, camTarget=46;
+  var viewBtns=[].slice.call(document.querySelectorAll('.views button[data-u]'));
+  var autoBtn=document.getElementById('auto');
+  autoBtn.setAttribute('aria-pressed',String(auto));
+
+  function frontU(){var u=(-rotY/TAU)%1;return u<0?u+1:u}
+  function goTo(u){
+    var want=-u*TAU, d=((want-rotY+Math.PI)%TAU+TAU)%TAU-Math.PI;
+    targetY=rotY+d; vel=0; lastTouch=performance.now();
+  }
+  viewBtns.forEach(function(b){b.addEventListener('click',function(){goTo(parseFloat(b.dataset.u))})});
+  autoBtn.addEventListener('click',function(){
+    auto=!auto;autoBtn.setAttribute('aria-pressed',String(auto));lastTouch=performance.now();
+  });
+
+  /* ---- diseño desplegado ---- */
+  var flat=document.getElementById('flat'), w1=document.getElementById('win1'), w2=document.getElementById('win2');
+  var HALF=.17;
+  function setFlat(u){
+    var l=(u-HALF)*100;
+    w1.style.left=l+'%'; w2.style.left=(l<0?l+100:l-100)+'%';
+    w2.style.display=(l<0||l>100-HALF*200)?'block':'none';
+  }
+  function flatPick(clientX){
+    var r=flat.getBoundingClientRect();goTo(Math.min(1,Math.max(0,(clientX-r.left)/r.width)));
+  }
+  flat.addEventListener('click',function(e){flatPick(e.clientX)});
+  flat.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight'||e.key==='ArrowLeft'){
+      e.preventDefault();goTo((frontU()+(e.key==='ArrowRight'?.08:-.08)+1)%1);
+    }
+  });
+  setFlat(frontU());
+
+  /* ---- WebGL ---- */
+  var renderer;
+  try{
+    renderer=new THREE.WebGLRenderer({antialias:true,alpha:true,powerPreference:'high-performance'});
+  }catch(err){renderer=null}
+  if(!renderer||typeof THREE==='undefined'){
+    loading.classList.add('off');fallback.classList.add('on');hint.classList.add('off');return;
+  }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
+  renderer.outputEncoding=THREE.sRGBEncoding;
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.15;
+  stage.insertBefore(renderer.domElement,stage.firstChild);
+
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(27,1,1,200);
+
+  var H=15, RT=4.4, RB=3.0;
+  var cup=new THREE.Group();
+  scene.add(cup);
+
+  var tex=new THREE.TextureLoader().load('img/wrap.jpg',function(t){
+    loading.classList.add('off');
+  },undefined,function(){loading.textContent='No se pudo cargar la textura'});
+  tex.encoding=THREE.sRGBEncoding;
+  tex.anisotropy=renderer.capabilities.getMaxAnisotropy();
+  tex.wrapS=THREE.RepeatWrapping;
+
+  var bodyGeo=new THREE.CylinderGeometry(RT,RB,H,180,1,true);
+  var body=new THREE.Mesh(bodyGeo,new THREE.MeshPhysicalMaterial({
+    map:tex,roughness:.46,metalness:0,clearcoat:.35,clearcoatRoughness:.35,
+    emissive:0xffffff,emissiveMap:tex,emissiveIntensity:.2
+  }));
+  cup.add(body);
+
+  var inner=new THREE.Mesh(new THREE.CylinderGeometry(RT-.16,RB-.14,H-.1,120,1,true),
+    new THREE.MeshStandardMaterial({color:0xe9e5dc,roughness:.75,side:THREE.BackSide}));
+  cup.add(inner);
+
+  var rim=new THREE.Mesh(new THREE.TorusGeometry(RT-.08,.09,16,160),
+    new THREE.MeshStandardMaterial({color:0xefece4,roughness:.5}));
+  rim.rotation.x=Math.PI/2;rim.position.y=H/2;cup.add(rim);
+
+  var floor=new THREE.Mesh(new THREE.CircleGeometry(RB-.14,64),
+    new THREE.MeshStandardMaterial({color:0xdedad1,roughness:.8}));
+  floor.rotation.x=-Math.PI/2;floor.position.y=-H/2+.35;cup.add(floor);
+  var base=new THREE.Mesh(new THREE.CircleGeometry(RB,64),new THREE.MeshStandardMaterial({color:0x0b0b0d,roughness:.7}));
+  base.rotation.x=Math.PI/2;base.position.y=-H/2;cup.add(base);
+
+  /* suelo: charco de luz y sombra de contacto */
+  function radialTex(stops){
+    var c=document.createElement('canvas');c.width=c.height=256;var g=c.getContext('2d');
+    var gr=g.createRadialGradient(128,128,0,128,128,128);
+    stops.forEach(function(s){gr.addColorStop(s[0],s[1])});
+    g.fillStyle=gr;g.fillRect(0,0,256,256);
+    var t=new THREE.CanvasTexture(c);return t;
+  }
+  var glow=new THREE.Mesh(new THREE.PlaneGeometry(46,26),new THREE.MeshBasicMaterial({
+    map:radialTex([[0,'rgba(255,255,255,.55)'],[.45,'rgba(255,255,255,.14)'],[1,'rgba(255,255,255,0)']]),
+    transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+  glow.rotation.x=-Math.PI/2;glow.position.y=-H/2-.05;scene.add(glow);
+  var shadow=new THREE.Mesh(new THREE.PlaneGeometry(15,15),new THREE.MeshBasicMaterial({
+    map:radialTex([[0,'rgba(0,0,0,.95)'],[.5,'rgba(0,0,0,.55)'],[1,'rgba(0,0,0,0)']]),
+    transparent:true,depthWrite:false}));
+  shadow.rotation.x=-Math.PI/2;shadow.position.y=-H/2-.02;scene.add(shadow);
+
+  /* luces */
+  scene.add(new THREE.AmbientLight(0xffffff,.42));
+  var key=new THREE.DirectionalLight(0xfff4e2,1.15);key.position.set(7,10,14);scene.add(key);
+  var fill=new THREE.DirectionalLight(0x9fb0ff,.35);fill.position.set(-10,3,8);scene.add(fill);
+  var rimA=new THREE.DirectionalLight(0xffb800,1.5);rimA.position.set(-9,5,-9);scene.add(rimA);
+  var rimB=new THREE.DirectionalLight(0xffffff,1.3);rimB.position.set(10,4,-8);scene.add(rimB);
+
+  function size(){
+    var w=stage.clientWidth,h=stage.clientHeight;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h;
+    camera.updateProjectionMatrix();
+  }
+  size();
+  if('ResizeObserver' in window)new ResizeObserver(size).observe(stage);else window.addEventListener('resize',size);
+
+  /* ---- interacción ---- */
+  var lastX=0,lastT=0;
+  stage.addEventListener('pointerdown',function(e){
+    if(e.target.closest('.views'))return;
+    dragging=true;targetY=null;vel=0;lastX=e.clientX;lastT=performance.now();lastTouch=lastT;
+    stage.classList.add('drag');hint.classList.add('off');
+    try{stage.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  stage.addEventListener('pointermove',function(e){
+    if(!dragging)return;
+    var now=performance.now(),dx=e.clientX-lastX,dt=Math.max(1,now-lastT)/1000;
+    var d=dx*.0105;rotY+=d;
+    vel=vel*.6+(d/dt)*.4;
+    lastX=e.clientX;lastT=now;lastTouch=now;
+  });
+  function up(){dragging=false;stage.classList.remove('drag');lastTouch=performance.now()}
+  stage.addEventListener('pointerup',up);
+  stage.addEventListener('pointercancel',up);
+  stage.addEventListener('dblclick',function(e){
+    if(e.target.closest('.views'))return;
+    camTarget=camTarget>40?31:46;
+  });
+  stage.addEventListener('keydown',function(e){
+    if(e.key==='ArrowLeft'){rotY+=.18;lastTouch=performance.now();e.preventDefault()}
+    if(e.key==='ArrowRight'){rotY-=.18;lastTouch=performance.now();e.preventDefault()}
+  });
+
+  /* ---- bucle ---- */
+  var prev=performance.now(),visible=true,lastBtn=-1;
+  if('IntersectionObserver' in window)new IntersectionObserver(function(es){visible=es[0].isIntersecting},{threshold:0}).observe(stage);
+
+  function frame(now){
+    requestAnimationFrame(frame);
+    var dt=Math.min(.05,(now-prev)/1000);prev=now;
+    if(!visible)return;
+    if(!dragging){
+      if(targetY!==null){
+        rotY+=(targetY-rotY)*Math.min(1,dt*5);
+        if(Math.abs(targetY-rotY)<.0008){rotY=targetY;targetY=null}
+      }else if(Math.abs(vel)>.01){
+        rotY+=vel*dt;vel*=Math.exp(-dt*3.2);
+      }else if(auto&&now-lastTouch>2500){
+        rotY+=dt*.32;
+      }
+    }
+    camDist+=(camTarget-camDist)*Math.min(1,dt*5);
+    var el=.2;
+    camera.position.set(0,Math.sin(el)*camDist+1.5,Math.cos(el)*camDist);
+    camera.lookAt(0,-.4,0);
+    cup.rotation.y=rotY;
+    renderer.render(scene,camera);
+
+    var u=frontU();setFlat(u);
+    var best=-1,bd=.1;
+    viewBtns.forEach(function(b,i){
+      var d=Math.abs(u-parseFloat(b.dataset.u));d=Math.min(d,1-d);if(d<bd){bd=d;best=i}
+    });
+    if(best!==lastBtn){
+      viewBtns.forEach(function(b,i){b.setAttribute('aria-pressed',String(i===best))});lastBtn=best;
+    }
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
